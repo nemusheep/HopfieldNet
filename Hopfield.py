@@ -28,7 +28,8 @@ class Hopfield:
         plt.show()
 
 d = 5 # data size of one side
-p = 0.1 # noise probability
+p = 0.3 # noise probability
+Q = 3 # number of train data
 
 # train data static defined
 trainData = np.array([[[1, -1, -1, -1, -1],
@@ -40,8 +41,13 @@ trainData = np.array([[[1, -1, -1, -1, -1],
                       [-1, -1, 1, -1, -1],
                       [-1, -1, 1, -1, -1],
                       [-1, -1, 1, -1, -1],
-                      [-1, -1, 1, -1, -1]]
-                      ])
+                      [-1, -1, 1, -1, -1]],
+                      [[-1, -1, -1, -1, -1],
+                      [-1, -1, -1, -1, -1],
+                      [1, 1, 1, 1, 1],
+                      [-1, -1, -1, -1, -1],
+                      [-1, -1, -1, -1, -1]]
+                      ]) # high orthogonality
 trainData = np.reshape(trainData, (trainData.shape[0], 25))
 
 # testData = np.random.randint(2, size=(5, 5))
@@ -50,12 +56,12 @@ trainData = np.reshape(trainData, (trainData.shape[0], 25))
 # generate noise
 noise = np.random.choice(a=[1, -1], size=(1, d**2), p=[1-p, p])
 testData = trainData*noise
-print(f'testdata {testData.shape}')
 
+# train model
 hn = Hopfield(dataSize=d)
 hn.fit(trainData)
-print(f'self.W {hn.W.shape}, self.thres {hn.thres.shape}')
 
+# associate
 data = []
 energy = []
 data.append(testData.copy()) # append initial state
@@ -68,17 +74,22 @@ for it in range(1, 101):
         data.append(newTestData.copy())
         energy.append(newEnergy.copy())
 
+# calculate eval value
+similarity = np.count_nonzero(data[len(data)-1] - trainData == 0, axis=1)/(d**2)
+accuracy = np.count_nonzero(similarity == 1.0)/Q
+print(similarity, accuracy)
+
 fig = plt.figure(figsize=(14, 4))
 
 # plot about each test data
-for q in range(2):
+for q in range(Q):
     for i in range(len(data)):
         plotData = np.reshape(data[i][q], (d, d))
         plt.subplot(1, len(data), i+1)
         plt.imshow(plotData, cmap='Greys')
         plt.xticks([])
         plt.yticks([])
-        plt.title(f't = {20 * i}, E = {energy[i][q]}')
+        plt.title(f't = {20 * i}, E = {energy[i][q] :.1f}')
 
     plt.savefig(f'result/fig_pattern{q}.png')
 # plt.show()
