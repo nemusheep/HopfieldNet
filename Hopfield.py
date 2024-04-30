@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from data import *
 
 class Hopfield:
 
@@ -28,26 +29,11 @@ class Hopfield:
         plt.show()
 
 d = 5 # data size of one side
-p = 0.3 # noise probability
+p = 0.1 # noise probability
 Q = 3 # number of train data
 
 # train data static defined
-trainData = np.array([[[1, -1, -1, -1, -1],
-                      [-1, 1, -1, -1, -1],
-                      [-1, -1, 1, -1, -1],
-                      [-1, -1, -1, 1, -1],
-                      [-1, -1, -1, -1, 1]],
-                      [[-1, -1, 1, -1, -1],
-                      [-1, -1, 1, -1, -1],
-                      [-1, -1, 1, -1, -1],
-                      [-1, -1, 1, -1, -1],
-                      [-1, -1, 1, -1, -1]],
-                      [[-1, -1, -1, -1, -1],
-                      [-1, -1, -1, -1, -1],
-                      [1, 1, 1, 1, 1],
-                      [-1, -1, -1, -1, -1],
-                      [-1, -1, -1, -1, -1]]
-                      ]) # high orthogonality
+trainData = np.array(lines)
 trainData = np.reshape(trainData, (trainData.shape[0], 25))
 
 # testData = np.random.randint(2, size=(5, 5))
