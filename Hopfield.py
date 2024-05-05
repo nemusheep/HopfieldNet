@@ -28,54 +28,94 @@ class Hopfield:
         plt.imshow(plotData, cmap='Greys')
         plt.show()
 
-d = 5 # data size of one side
-p = 0.1 # noise probability
-Q = 3 # number of train data
 
-# train data static defined
-trainData = np.array(lines)
-trainData = np.reshape(trainData, (trainData.shape[0], 25))
+def associate(d, p, Q, model, plot=False):
+    tmax = 500
+    # generate noise
+    noise = np.random.choice(a=[1, -1], size=(1, d**2), p=[1-p, p])
+    testData = trainData*noise
 
-# testData = np.random.randint(2, size=(5, 5))
-# testData = testData*2 - 1
+    data = []
+    energy = []
+    data.append(testData.copy()) # append initial state
+    energy.append(model.calcEnergy(testData))
 
-# generate noise
-noise = np.random.choice(a=[1, -1], size=(1, d**2), p=[1-p, p])
-testData = trainData*noise
+    for it in range(1, 1+tmax):
+        newTestData = model.update(testData)
+        newEnergy = model.calcEnergy(newTestData)
+        if it%(tmax/5) == 0:
+            data.append(newTestData.copy())
+            energy.append(newEnergy.copy())
 
-# train model
-hn = Hopfield(dataSize=d)
-hn.fit(trainData)
+    # calculate eval value
+    similarity = np.count_nonzero(data[len(data)-1] - trainData == 0, axis=1)/(d**2)
+    accuracy = np.count_nonzero(similarity == 1.0)/Q
 
-# associate
-data = []
-energy = []
-data.append(testData.copy()) # append initial state
-energy.append(hn.calcEnergy(testData))
+    # plot about each test data
+    if plot:
+        fig = plt.figure(figsize=(14, 4))
+        for q in range(Q):
+            for i in range(len(data)):
+                plotData = np.reshape(data[i][q], (d, d))
+                plt.subplot(1, len(data), i+1)
+                plt.imshow(plotData, cmap='Greys')
+                plt.xticks([])
+                plt.yticks([])
+                E = energy[i]
+                if Q > 1:
+                    E = energy[i][q]
+                plt.title(f't = {(tmax/5) * i}, E = {E :.1f}')
 
-for it in range(1, 101):
-    newTestData = hn.update(testData)
-    newEnergy = hn.calcEnergy(newTestData)
-    if it%20 == 0:
-        data.append(newTestData.copy())
-        energy.append(newEnergy.copy())
+            plt.savefig(f'result/fig{q}_d{d}_p{p}.png')
+        plt.close(fig)
+    
+    return similarity, accuracy
 
-# calculate eval value
-similarity = np.count_nonzero(data[len(data)-1] - trainData == 0, axis=1)/(d**2)
-accuracy = np.count_nonzero(similarity == 1.0)/Q
-print(similarity, accuracy)
+if __name__ == '__main__':
+    it = 1000
+    d = 5
 
-fig = plt.figure(figsize=(14, 4))
+    haxis = np.linspace(0, 1.0, 5)
+    fig1 = plt.figure()
+    fig2 = plt.figure()
 
-# plot about each test data
-for q in range(Q):
-    for i in range(len(data)):
-        plotData = np.reshape(data[i][q], (d, d))
-        plt.subplot(1, len(data), i+1)
-        plt.imshow(plotData, cmap='Greys')
-        plt.xticks([])
-        plt.yticks([])
-        plt.title(f't = {20 * i}, E = {energy[i][q] :.1f}')
+    for q in [2, 4]:
 
-    plt.savefig(f'result/fig_pattern{q}.png')
-# plt.show()
+        simList = []
+        accList = []
+
+        for p in [0.0, 0.25, 0.5, 0.75, 1.0]:
+            # train model
+            trainData = np.array(lines[:q])
+            trainData = np.reshape(trainData, (trainData.shape[0], d**2))
+            hn = Hopfield(dataSize=d)
+            hn.fit(trainData)
+
+            # associate
+            similarity = np.zeros(q)
+            accuracy = 0
+            for _ in range(it):
+                sim_i, acc_i = associate(d, p, q, model=hn)
+                similarity += sim_i
+                accuracy += acc_i
+            similarity = np.mean(similarity/it)
+            accuracy /= it
+            print(similarity, accuracy)
+            simList.append(similarity)
+            accList.append(accuracy)
+        
+        plt.figure(fig1.number)
+        plt.plot(haxis, simList, label=f'num_{q}')
+        plt.figure(fig2.number)
+        plt.plot(haxis, accList, label=f'num_{q}')
+    
+    plt.figure(fig1.number)
+    plt.xlabel('noise prob')
+    plt.ylabel('similarity')
+    plt.legend()
+    plt.savefig('fig/sim2.png')
+    plt.figure(fig2.number)
+    plt.xlabel('noise prob')
+    plt.ylabel('accuracy')
+    plt.legend()
+    plt.savefig('fig/acc2.png')
