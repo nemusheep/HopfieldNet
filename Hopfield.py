@@ -74,19 +74,20 @@ def associate(d, p, Q, model, plot=False):
 if __name__ == '__main__':
     it = 1000
     d = 5
+    data = lines
 
-    haxis = np.linspace(0, 1.0, 5)
+    haxis = np.linspace(0.0, 1.0, 11)
     fig1 = plt.figure()
     fig2 = plt.figure()
 
-    for q in [2, 4]:
+    for q in [1, 3, 5]:
 
         simList = []
         accList = []
 
-        for p in [0.0, 0.25, 0.5, 0.75, 1.0]:
+        for p in [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]:
             # train model
-            trainData = np.array(lines[:q])
+            trainData = np.array(data[:q])
             trainData = np.reshape(trainData, (trainData.shape[0], d**2))
             hn = Hopfield(dataSize=d)
             hn.fit(trainData)
@@ -113,9 +114,9 @@ if __name__ == '__main__':
     plt.xlabel('noise prob')
     plt.ylabel('similarity')
     plt.legend()
-    plt.savefig('fig/sim2.png')
+    plt.savefig('fig/sim.png')
     plt.figure(fig2.number)
     plt.xlabel('noise prob')
     plt.ylabel('accuracy')
     plt.legend()
-    plt.savefig('fig/acc2.png')
+    plt.savefig('fig/acc.png')
