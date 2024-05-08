@@ -14,6 +14,10 @@ class Hopfield:
         np.fill_diagonal(self.W, 0)
         return self.W
     
+    def PIMfit(self, trainData):
+        self.W = np.dot(np.dot(trainData.T, np.linalg.inv(np.dot(trainData, trainData.T))), trainData)
+        return self.W
+    
     def update(self, testData):
         randind = np.random.randint(self.dataSize**2)
         testData[:, randind] = np.sign(np.dot(self.W[randind], testData.T) - self.thres[randind])
@@ -29,7 +33,7 @@ class Hopfield:
         plt.show()
 
 
-def associate(d, p, Q, model, plot=False):
+def associate(d, p, Q, trainData, model, plot=False):
     tmax = 500
     # generate noise
     noise = np.random.choice(a=[1, -1], size=(1, d**2), p=[1-p, p])
@@ -74,29 +78,30 @@ def associate(d, p, Q, model, plot=False):
 if __name__ == '__main__':
     it = 1000
     d = 5
-    data = lines
+    data = ort
 
-    haxis = np.linspace(0.0, 1.0, 11)
+    # haxis = np.linspace(0.0, 1.0, 11)
+    haxis = np.linspace(1, len(data), len(data))
     fig1 = plt.figure()
     fig2 = plt.figure()
 
-    for q in [1, 3, 5]:
+    for p in [0.05, 0.1, 0.2]:
 
         simList = []
         accList = []
 
-        for p in [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]:
+        for q in range(1, 1+len(data)):
             # train model
             trainData = np.array(data[:q])
             trainData = np.reshape(trainData, (trainData.shape[0], d**2))
             hn = Hopfield(dataSize=d)
-            hn.fit(trainData)
+            hn.PIMfit(trainData)
 
             # associate
             similarity = np.zeros(q)
             accuracy = 0
             for _ in range(it):
-                sim_i, acc_i = associate(d, p, q, model=hn)
+                sim_i, acc_i = associate(d, p, q, trainData, model=hn)
                 similarity += sim_i
                 accuracy += acc_i
             similarity = np.mean(similarity/it)
@@ -106,17 +111,17 @@ if __name__ == '__main__':
             accList.append(accuracy)
         
         plt.figure(fig1.number)
-        plt.plot(haxis, simList, label=f'num_{q}')
+        plt.plot(haxis, simList, label=f'noise_{p}')
         plt.figure(fig2.number)
-        plt.plot(haxis, accList, label=f'num_{q}')
+        plt.plot(haxis, accList, label=f'noise_{p}')
     
     plt.figure(fig1.number)
-    plt.xlabel('noise prob')
+    plt.xlabel('num of pattern')
     plt.ylabel('similarity')
     plt.legend()
-    plt.savefig('fig/sim.png')
+    plt.savefig('fig/simPIM4.png')
     plt.figure(fig2.number)
-    plt.xlabel('noise prob')
+    plt.xlabel('num of pattern')
     plt.ylabel('accuracy')
     plt.legend()
-    plt.savefig('fig/acc.png')
+    plt.savefig('fig/accPIM4.png')
