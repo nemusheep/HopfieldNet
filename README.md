@@ -1,8 +1,8 @@
 # Hopfield Network
 Hopfield network is the recurrent neural network which realize associated memory.
-This network learns the self weight W from training data only. And the rule of learning(Hebbian) is presented as below, except diagonal elements. x(q) is the memorizing pattern of index q, and Q is the number of memorizing patterns.
+This network learns the self weight W from training data only. And the rule of learning(Hebbian) is presented as below, except diagonal elements. x^(q) is the memorizing pattern of index q, and Q is the number of memorizing patterns.
 ```math
-W = \sum_q^Q x^{(q)}(x^{q})^T \frac{1}{Q}
+W = \sum_q^Q x^{(q)}(x^{(q)})^T \frac{1}{Q}
 ```
 And diagonal elements is constantly zero.
 Not complecated method is here. Not need back propagation. This method is very easy for model to learn.
@@ -34,7 +34,7 @@ This is false attractor.
 
 ### cf. Moore-Penrose pseudo inverse matrix model
 Instead of using learning model of self-correlation(Hebbian), the method using Moore-Penrose Pseudo Inverse Matrix is the effective way for eliminating or reducing false attractors and inproving the accuracy of association.
-This method is learning connecting(synaptic) weight as below. X is the (25, Q) size matrix generated from aranging col vectors of each memorizing pattern.
+This method is learning connecting(synaptic) weight as below. X is the (25, Q) size matrix generated from arranging col vectors of each memorizing pattern.
 ```math
 W = X (X^T X)^{-1} X^T
 ```
