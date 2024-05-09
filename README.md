@@ -1,26 +1,26 @@
-## Hopfield Network
-This repository is mainly for an assignment from my university.
+# Hopfield Network
 Hopfield network is the recurrent neural network which realize associated memory.
-This network learns the self weight from training data only. And the rule of learning(Hebbian) is presented as below.
+This network learns the self weight W from training data only. And the rule of learning(Hebbian) is presented as below, except diagonal elements. x(q) is the memorizing pattern of index q, and Q is the number of memorizing patterns.
 ```math
 W = \sum_q^Q x^{(q)}(x^{q})^T \frac{1}{Q}
 ```
+And diagonal elements is constantly zero.
 Not complecated method is here. Not need back propagation. This method is very easy for model to learn.
 
 ### Description, run env
-Mainly use Hopfield.py, and the image created from this file is collected into result directory.
-Module is already everyone knows, matplotlib and numpy.
+Mainly use Hopfield.py, and the image created from this file is collected into result or fig directory. Data used as memorizing patterns is collected in data directory.
+Modules I used in this are matplotlib and numpy. Version is shown below.
 ```
 Python 3.11.4
 numpy 1.25.2
 matplotlib 3.7.2
 ```
-to run
+To run
 ```
-python3 Hopfield.py
+$ python3 Hopfield.py
 ```
 
-### Result memo
+### Result memo : false attractor
 In data lines shown as below,
 <div style='display: flex;' >
 <img src='https://github.com/nemusheep/HopfieldNet/blob/main/data/lines_0.png' width='30%' height='auto'>
@@ -48,3 +48,9 @@ The graphs shown below are the fluctuation of accuracy dependent on noise probab
 <img src='https://github.com/nemusheep/HopfieldNet/blob/main/fig/acc.png' width='40%' height='auto'>
 <img src='https://github.com/nemusheep/HopfieldNet/blob/main/fig/accPIM.png' width='40%' height='auto'>
 </div>
+
+### ref
+- https://qiita.com/grouse324/items/95e93f8c3e4679ecf39a
+- https://rishida.hatenablog.com/entry/2014/03/03/174331
+- https://www.cis.twcu.ac.jp/~asakawa/chiba2002/lect6-mutual/mutual.html
+- https://www.jstage.jst.go.jp/article/jnns/3/4/3_4_141/_pdf
